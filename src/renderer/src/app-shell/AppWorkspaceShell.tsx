@@ -10,6 +10,7 @@ import type { VirtualizedScrollAnchor } from '../hooks/useVirtualizedScrollAncho
 import { useAppStore } from '../store'
 import { OverlayBoundary } from './app-root-surface-boundaries'
 import { USAGE_STRIP_HEIGHT } from '../components/sidebar/workspace-chrome-metrics'
+import { TabAccountLimitCard } from '../components/tab-bar/TabAccountLimitCard'
 import { TitlebarLeftControls } from './TitlebarLeftControls'
 import { RightSidebarToggle, TitlebarMainStrip } from './TitlebarMainStrip'
 import type { AppChromeLayout } from './use-app-chrome-layout'
@@ -232,6 +233,7 @@ export function AppWorkspaceShell(props: {
                     </RecoverableRenderErrorBoundary>
                   </Suspense>
                 </div>
+                {layout.terminalWorkbenchVisible ? <TabAccountLimitCard /> : null}
                 {floatingWorkspace.showToggleButton ? (
                   <MemoFloatingTerminalToggleButton
                     open={floatingWorkspace.open}

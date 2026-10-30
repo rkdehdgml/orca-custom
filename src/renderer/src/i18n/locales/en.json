@@ -3876,6 +3876,27 @@
             "fdb2691425": "Collapse pane",
             "95db5f2f7d": "Close tab"
           },
+          "TabAccountChip": {
+            "claudeAccount": "Claude account",
+            "codexAccount": "Codex account",
+            "systemDefault": "System default",
+            "noOtherAccount": "No other account to switch to.",
+            "addAccount": "Add account…",
+            "manageAccounts": "Manage accounts…",
+            "aria": "Account for this tab: {{value0}}",
+            "switching": "Switching this tab to {{value0}}.",
+            "switchWaiting": "Switching this tab to {{value0}} once the current reply finishes."
+          },
+          "TabAccountLimitCard": {
+            "title": "Continue with another account",
+            "reached": "{{value0}} is at {{value1}} {{value2}}%.",
+            "keep": "Keep",
+            "noAccount": "There is no account to switch to."
+          },
+          "TabContextUsage": {
+            "tooltip": "Context window {{value0}}% used",
+            "stale": "Not updated for over a minute"
+          },
           "SortableTabContextMenu": {
             "35e8892fd0": "Tab Color",
             "2f697b3c31": "Change Title",

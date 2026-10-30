@@ -3,6 +3,7 @@ import { checkHookOwnerPresence } from '../../../shared/agent-hook-owner-presenc
 import { parsePaneKey } from '../../../shared/stable-pane-id'
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
 import { randomUUID } from 'node:crypto'
+import { parseClaudeContextUsage } from '../../../shared/claude-context-usage'
 
 import {
   CLAUDE_STATUSLINE_PATHNAME,
@@ -120,6 +121,10 @@ export abstract class AgentHookServerLifecycle extends AgentHookServerStatusHook
           const statusLineEvent = parseClaudeStatusLineBody(body)
           if (statusLineEvent) {
             this.onClaudeStatusLine?.(statusLineEvent)
+          }
+          const contextUsage = parseClaudeContextUsage(body)
+          if (contextUsage) {
+            this.onClaudeContext?.(contextUsage)
           }
           res.writeHead(204)
           res.end()
@@ -259,6 +264,7 @@ export abstract class AgentHookServerLifecycle extends AgentHookServerStatusHook
     this.env = 'production'
     this.onAgentStatus = null
     this.onClaudeStatusLine = null
+    this.onClaudeContext = null
     this.clearStartupPromptClaims?.()
     this.clearStartupPromptClaims = null
     this.onStartupPromptClaim = null

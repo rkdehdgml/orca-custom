@@ -1,3 +1,4 @@
+import type { ClaudeContextUsage } from '../../shared/claude-context-usage'
 import type { ClaudeUsageBreakdownKind, ClaudeUsageSnapshot } from '../../shared/claude-usage-types'
 import type { CodexUsageBreakdownKind, CodexUsageSnapshot } from '../../shared/codex-usage-types'
 import type {
@@ -57,4 +58,6 @@ export type RateLimitsApi = {
   fetchInactiveCodexAccounts: () => Promise<void>
   refreshGrok: () => Promise<RateLimitState>
   onUpdate: (callback: (state: RateLimitState) => void) => () => void
+  /** Desktop only: a Claude pane's context-window share, pushed from its statusline. */
+  onClaudeContext?: (callback: (usage: ClaudeContextUsage) => void) => () => void
 }

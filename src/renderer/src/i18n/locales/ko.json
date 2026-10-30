@@ -3507,6 +3507,27 @@
             "fdb2691425": "창 축소",
             "95db5f2f7d": "탭 닫기"
           },
+          "TabAccountChip": {
+            "claudeAccount": "Claude 계정",
+            "codexAccount": "Codex 계정",
+            "systemDefault": "시스템 기본 계정",
+            "noOtherAccount": "전환할 다른 계정이 없습니다.",
+            "addAccount": "계정 추가…",
+            "manageAccounts": "계정 관리…",
+            "aria": "이 탭의 계정: {{value0}}",
+            "switching": "이 탭을 {{value0}} 계정으로 전환합니다.",
+            "switchWaiting": "현재 응답이 끝나면 이 탭을 {{value0}} 계정으로 전환합니다."
+          },
+          "TabAccountLimitCard": {
+            "title": "다른 계정으로 이어서 작업하기",
+            "reached": "{{value0}} 계정의 {{value1}} 사용량이 {{value2}}%입니다.",
+            "keep": "유지",
+            "noAccount": "전환할 계정이 없습니다."
+          },
+          "TabContextUsage": {
+            "tooltip": "컨텍스트 {{value0}}% 사용 중",
+            "stale": "1분 넘게 갱신되지 않았습니다"
+          },
           "SortableTabContextMenu": {
             "35e8892fd0": "탭 색상",
             "2f697b3c31": "제목 변경",

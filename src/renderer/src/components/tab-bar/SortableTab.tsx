@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { X, Minimize2, Pin } from 'lucide-react'
 import { stripLeadingAgentTitleDecoration } from '../../../../shared/agent-title-decoration'
+import { TabAccountChip } from './TabAccountChip'
 import { getAgentLabel } from '@/lib/agent-catalog'
 import { basename } from '@/lib/path'
 import { Input } from '@/components/ui/input'
@@ -312,6 +313,9 @@ export default function SortableTab({
           <Minimize2 className="w-3 h-3" />
         </button>
       )}
+      {!isEditing && nativeChat === undefined ? (
+        <TabAccountChip tabId={tab.id} agent={tabAgent} />
+      ) : null}
       {!isEditing && !isPinned && (
         <button
           className={`relative z-10 flex items-center justify-center w-4 h-4 rounded-sm shrink-0 ${

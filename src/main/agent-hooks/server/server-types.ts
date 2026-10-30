@@ -1,4 +1,5 @@
 import type { ProgramStatusFacet } from '../../../shared/program-status/facet'
+import type { ClaudeContextUsage } from '../../../shared/claude-context-usage'
 import type { ClaudeStatusLineRateLimits } from '../../../shared/claude-statusline-rate-limits'
 import type { PersistedAgentExitEvidence } from './agent-exit-evidence'
 import type { AgentHookEventPayload } from '../../../shared/agent-hook-listener/listener-event'
@@ -152,4 +153,5 @@ export type NormalizedLocalHook = {
 }
 
 export type ServerStatusLineListener = ((event: ClaudeStatusLineRateLimits) => void) | null
+export type ServerClaudeContextListener = ((usage: ClaudeContextUsage) => void) | null
 export type ServerAgentStatusListener = ((payload: EnrichedAgentHookEventPayload) => void) | null

@@ -1,4 +1,5 @@
 import type { RateLimitState } from '../../../../shared/rate-limit-types'
+import { recordClaudeContextUsage } from '../../lib/claude-context-usage-store'
 import { useAppStore } from '../../store'
 
 export function registerRateLimitIpcBridge(unsubs: (() => void)[]): void {
@@ -12,6 +13,10 @@ export function registerRateLimitIpcBridge(unsubs: (() => void)[]): void {
       useAppStore.getState().setRateLimitsFromPush(state as RateLimitState)
     })
   )
+  const unsubscribeClaudeContext = window.api.rateLimits.onClaudeContext?.(recordClaudeContextUsage)
+  if (unsubscribeClaudeContext) {
+    unsubs.push(unsubscribeClaudeContext)
+  }
   // The startup get is a fallback: a push before resolution permanently wins.
   window.api.rateLimits.get().then((state) => {
     initialSnapshotPending = false

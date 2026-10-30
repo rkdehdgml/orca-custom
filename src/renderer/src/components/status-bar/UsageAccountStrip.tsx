@@ -19,7 +19,8 @@ import { CodexSwitcherMenu } from './CodexSwitcherMenu'
 import { barColor, clampUsedPercent, ProviderIcon } from './tooltip'
 import { formatUsagePercentageLabel } from './usage-percentage-label'
 
-const INACTIVE_USAGE_REFRESH_MS = 5 * 60_000
+// Just over the main process 60s fetch debounce so a tick is never swallowed.
+const INACTIVE_USAGE_REFRESH_MS = 61_000
 const MINUTE_MS = 60_000
 const HOUR_MS = 60 * MINUTE_MS
 const DAY_MS = 24 * HOUR_MS

@@ -168,6 +168,14 @@ function storeTabAccountPin(tabId: string, pin: TerminalAccountPin): void {
   })
 }
 
+/** Changes one provider's account for a tab while keeping the other provider's pin. */
+export function patchTabAccountPin(tabId: string, patch: TerminalAccountPin): void {
+  const location = locateTerminalTab(useAppStore.getState().tabsByWorktree, tabId)
+  if (location) {
+    storeTabAccountPin(tabId, { ...location.tab.accountPin, ...patch })
+  }
+}
+
 const pendingByTab = new Map<string, Promise<TerminalAccountPin | undefined>>()
 
 /**

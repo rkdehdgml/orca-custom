@@ -18,6 +18,7 @@ import { setAntigravityNativeCredentialChangeListener } from './antigravity/nati
 import { createAccountRuntimeTargetSettingsSync } from './rate-limits/account-runtime-target-sync'
 import { normalizeCodexRuntimeSelection } from './codex-accounts/runtime-selection'
 import { normalizeClaudeRuntimeSelection } from './claude-accounts/runtime-selection'
+import type { ClaudeContextUsage } from '../shared/claude-context-usage'
 import type { ClaudeStatusLineRateLimits } from '../shared/claude-statusline-rate-limits'
 
 export type ProviderAccountServices = {
@@ -33,11 +34,14 @@ export function createProviderAccountServices(
   options: {
     codexAccountLifecycle?: ConstructorParameters<typeof CodexAccountService>[3]
     setClaudeStatusLineListener: (listener: (event: ClaudeStatusLineRateLimits) => void) => void
+    setClaudeContextListener?: (listener: (usage: ClaudeContextUsage) => void) => void
   }
 ): ProviderAccountServices {
   const agentView = getClaudeAgentViewService()
   void agentView.reconcile(store.getSettings())
   const rateLimits = new RateLimitService()
+  // Fork: poll every minute so per-account usage and the tab's 95% prompt stay current (upstream: 15 min).
+  rateLimits.setPollingInterval(60_000)
   const codexRuntimeHome = new CodexRuntimeHomeService(store)
   const codexAccounts = new CodexAccountService(
     store,
@@ -108,6 +112,7 @@ export function createProviderAccountServices(
   options.setClaudeStatusLineListener((event) => {
     rateLimits.ingestLiveClaudeRateLimits(event)
   })
+  options.setClaudeContextListener?.((usage) => rateLimits.ingestClaudeContext(usage))
   rateLimits.setOpenCodeGoConfigResolver(() => {
     const settings = store.getSettings()
     return {

@@ -80,6 +80,7 @@ vi.mock('../sidebar/WorktreeCardHelpers', () => ({
   FilledBellIcon: () => <span data-filled-bell />
 }))
 
+vi.mock('./TabAccountChip', () => ({ TabAccountChip: () => null }))
 vi.mock('./shell-icons', () => ({
   ShellIcon: () => <span data-shell-icon />
 }))

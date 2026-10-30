@@ -44,6 +44,7 @@ import type {
   RetiredPaneAlias,
   RetiredPaneFence,
   ServerAgentStatusListener,
+  ServerClaudeContextListener,
   ServerStatusLineListener,
   StatusChangeListener,
   StatusDropListener,
@@ -102,6 +103,7 @@ export abstract class AgentHookServerState {
   protected env = 'production'
   protected onAgentStatus: ServerAgentStatusListener = null
   protected onClaudeStatusLine: ServerStatusLineListener = null
+  protected onClaudeContext: ServerClaudeContextListener = null
   protected onStartupPromptClaim: ((body: unknown) => boolean | 'pending') | null = null
   protected clearStartupPromptClaims: (() => void) | null = null
   protected statusHooksEnabled = true

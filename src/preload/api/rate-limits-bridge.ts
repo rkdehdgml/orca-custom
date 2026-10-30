@@ -4,6 +4,10 @@ import type {
   RateLimitRuntimeTarget,
   RateLimitState
 } from '../../shared/rate-limit-types'
+import {
+  CLAUDE_CONTEXT_USAGE_CHANNEL,
+  type ClaudeContextUsage
+} from '../../shared/claude-context-usage'
 import type { PreloadApi } from '../api-types'
 
 export const rateLimitsApi = {
@@ -24,5 +28,11 @@ export const rateLimitsApi = {
     const listener = (_event: Electron.IpcRendererEvent, state: RateLimitState) => callback(state)
     ipcRenderer.on('rateLimits:update', listener)
     return () => ipcRenderer.removeListener('rateLimits:update', listener)
+  },
+  onClaudeContext: (callback: (usage: ClaudeContextUsage) => void): (() => void) => {
+    const listener = (_event: Electron.IpcRendererEvent, usage: ClaudeContextUsage) =>
+      callback(usage)
+    ipcRenderer.on(CLAUDE_CONTEXT_USAGE_CHANNEL, listener)
+    return () => ipcRenderer.removeListener(CLAUDE_CONTEXT_USAGE_CHANNEL, listener)
   }
 } satisfies PreloadApi['rateLimits']

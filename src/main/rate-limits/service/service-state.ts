@@ -1,4 +1,8 @@
 import type { BrowserWindow } from 'electron'
+import {
+  CLAUDE_CONTEXT_USAGE_CHANNEL,
+  type ClaudeContextUsage
+} from '../../../shared/claude-context-usage'
 import type {
   InactiveAccountUsage,
   ProviderRateLimits,
@@ -180,5 +184,13 @@ export abstract class RateLimitServiceState {
       return
     }
     this.mainWindow.webContents.send('rateLimits:update', state)
+  }
+
+  /** Context share is per pane and short-lived, so it bypasses the persisted limit state. */
+  ingestClaudeContext(usage: ClaudeContextUsage): void {
+    if (!this.mainWindow || this.mainWindow.isDestroyed()) {
+      return
+    }
+    this.mainWindow.webContents.send(CLAUDE_CONTEXT_USAGE_CHANNEL, usage)
   }
 }
