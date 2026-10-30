@@ -5,6 +5,7 @@ import type { ClaudeProfileRouter } from './claude-profile-router'
 import type { ClaudeWslProfileRouter } from './claude-profile-wsl-router'
 import type { ClaudeAccountSelectionTarget } from './runtime-selection'
 import type { ClaudeObservedConfigDirs } from './claude-observed-config-dirs'
+import type { ClaudeRuntimeAuthPreparation } from './runtime-auth/runtime-auth-types'
 
 let installed: ClaudeProfileRouter | undefined
 
@@ -43,6 +44,17 @@ export function withClaudeProfileTerminalEnv<Env extends Record<string, string> 
 ): Env | Record<string, string> {
   const profileEnv = installed?.terminalEnv(target)
   return profileEnv ? { ...env, ...profileEnv } : env
+}
+
+/** Auth and env for a pane pinned to one account; refuses when the desktop router is not installed. */
+export async function prepareClaudePaneAccount(
+  accountId: string | null,
+  paneKey: string
+): Promise<ClaudeRuntimeAuthPreparation> {
+  if (!installed) {
+    throw new Error('Claude account routing is not initialized')
+  }
+  return installed.preparePaneAccount(accountId, paneKey)
 }
 
 /** The user's CLAUDE_CONFIG_DIR from the login shell, folders Orca saw Claude use, and account homes. */

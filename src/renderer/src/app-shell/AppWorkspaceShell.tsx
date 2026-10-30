@@ -7,6 +7,9 @@ import { RecoverableRenderErrorBoundary } from '../components/error-boundaries/R
 import { FloatingTerminalToggleButton } from '../components/floating-terminal/FloatingTerminalToggleButton'
 import { TerminalWorkbenchContainer } from '../components/TerminalWorkbenchContainer'
 import type { VirtualizedScrollAnchor } from '../hooks/useVirtualizedScrollAnchor'
+import { useAppStore } from '../store'
+import { OverlayBoundary } from './app-root-surface-boundaries'
+import { USAGE_STRIP_HEIGHT } from '../components/sidebar/workspace-chrome-metrics'
 import { TitlebarLeftControls } from './TitlebarLeftControls'
 import { RightSidebarToggle, TitlebarMainStrip } from './TitlebarMainStrip'
 import type { AppChromeLayout } from './use-app-chrome-layout'
@@ -28,6 +31,11 @@ const ArtifactsPage = lazy(() => import('../components/artifacts/ArtifactsPage')
 const WorkspaceSpacePage = lazy(() => import('../components/workspace-space/WorkspaceSpacePage'))
 const MobilePage = lazy(() => import('../components/mobile/MobilePage'))
 const Terminal = lazy(() => import('../components/Terminal'))
+const UsageAccountStrip = lazy(() =>
+  import('../components/status-bar/UsageAccountStrip').then((module) => ({
+    default: module.UsageAccountStrip
+  }))
+)
 
 type WorktreeSidebarScrollRefs = {
   scrollOffsetRef: React.MutableRefObject<number>
@@ -104,6 +112,7 @@ export function AppWorkspaceShell(props: {
   const scrollAnchorRef = useRef<VirtualizedScrollAnchor>(null)
   const sidebarScrollRefs = { scrollOffsetRef, scrollAnchorRef }
   const { setOpenWithFocus } = floatingWorkspace
+  const statusBarVisible = useAppStore((s) => s.statusBarVisible)
   const toggleFloatingWorkspace = useCallback(
     () => setOpenWithFocus((open) => !open),
     [setOpenWithFocus]
@@ -230,6 +239,23 @@ export function AppWorkspaceShell(props: {
                   />
                 ) : null}
               </div>
+              {statusBarVisible ? (
+                <Suspense
+                  fallback={<div className="shrink-0" style={{ height: USAGE_STRIP_HEIGHT }} />}
+                >
+                  <OverlayBoundary
+                    boundaryId="overlay.usage-account-strip"
+                    resetKey={layout.activeView}
+                    title={translate('auto.App.2e8ff36f94', 'The status bar hit an error.')}
+                    description={translate(
+                      'auto.App.8a023cea1f',
+                      'Retry the status bar to remount its controls.'
+                    )}
+                  >
+                    <UsageAccountStrip />
+                  </OverlayBoundary>
+                </Suspense>
+              ) : null}
             </div>
           </div>
         </div>

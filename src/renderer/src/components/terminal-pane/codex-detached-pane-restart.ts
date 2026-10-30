@@ -227,6 +227,7 @@ async function executeDetachedCodexPaneRestart(
       ? { placement: { kind: 'root' as const } }
       : {}),
     ...(tab.shellOverride ? { shellOverride: tab.shellOverride } : {}),
+    ...(tab.accountPin ? { accountPin: tab.accountPin } : {}),
     ...(projectRuntime ? { projectRuntime } : {}),
     initiallyHidden: true
   })

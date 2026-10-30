@@ -1,4 +1,8 @@
-import { withClaudeProfileTerminalEnv } from '../../../claude-accounts/claude-profile-installed-router'
+import { randomUUID } from 'node:crypto'
+import {
+  prepareClaudePaneAccount,
+  withClaudeProfileTerminalEnv
+} from '../../../claude-accounts/claude-profile-installed-router'
 import { mintPtySessionId } from '../../../daemon/pty-session-id'
 import { LocalPtyProvider } from '../../../providers/local-pty-provider'
 import {
@@ -11,6 +15,14 @@ import { resolvePtySpawnStartupTarget } from '../spawn-startup-target'
 import type { PtyIpcSpawnState } from './spawn-state'
 import { localPtySpawnCwd } from '../host-env/spawn-cwd'
 import { getConnectionExecutionHostId } from '../../../../shared/execution-host'
+import { normalizeTerminalAccountPin } from '../../../../shared/terminal-account-pin'
+
+// One pointer file per pane; a spawn without pane ids still gets a private one.
+function pinnedPaneKey(args: PtyIpcSpawnState['args']): string {
+  return typeof args.tabId === 'string' && typeof args.leafId === 'string'
+    ? `${args.tabId}:${args.leafId}`
+    : `session:${args.sessionId ?? randomUUID()}`
+}
 
 export async function preparePtyIpcSpawnPreflight(ctx: PtyIpcSpawnState): Promise<void> {
   const args = ctx.args
@@ -100,10 +112,21 @@ export async function preparePtyIpcSpawnPreflight(ctx: PtyIpcSpawnState): Promis
   ctx.expectedWslDistro = target.expectedWslDistro
   ctx.codexSelectionTarget = target.codexSelectionTarget
   ctx.spawnTiming.mark('preflight')
-  args.env = withClaudeProfileTerminalEnv(args.env, ctx.codexSelectionTarget)
-  ctx.claudeAuth =
-    ctx.isClaudeLaunch && ctx.deps.prepareClaudeAuth
-      ? await ctx.deps.prepareClaudeAuth(ctx.codexSelectionTarget)
-      : null
+  const accountPin = normalizeTerminalAccountPin(args.accountPin)
+  if (accountPin?.claudeAccountId !== undefined && ctx.codexSelectionTarget.runtime !== 'wsl') {
+    // A pinned terminal ignores the global selection, including for a direct `claude` launch.
+    const preparation = await prepareClaudePaneAccount(
+      accountPin.claudeAccountId,
+      pinnedPaneKey(args)
+    )
+    args.env = { ...args.env, ...preparation.envPatch }
+    ctx.claudeAuth = ctx.isClaudeLaunch ? preparation : null
+  } else {
+    args.env = withClaudeProfileTerminalEnv(args.env, ctx.codexSelectionTarget)
+    ctx.claudeAuth =
+      ctx.isClaudeLaunch && ctx.deps.prepareClaudeAuth
+        ? await ctx.deps.prepareClaudeAuth(ctx.codexSelectionTarget)
+        : null
+  }
   ctx.spawnTiming.mark('auth')
 }

@@ -12,6 +12,7 @@ import PinnedTabCloseDialog from './components/terminal-pane/PinnedTabCloseDialo
 import RunningTerminalCloseDialog from './components/terminal-pane/RunningTerminalCloseDialog'
 import WorktreeBaseFallbackDialog from './components/WorktreeBaseFallbackDialog'
 import ClaudeAccountSwitchDialog from './components/ClaudeAccountSwitchDialog'
+import TerminalAccountChoiceDialog from './components/TerminalAccountChoiceDialog'
 import { useUnreadDockBadge } from './hooks/useUnreadDockBadge'
 import { AppBackgroundServices } from './app-shell/AppBackgroundServices'
 import { AppRootSurfaces } from './app-shell/AppRootSurfaces'
@@ -121,6 +122,7 @@ function App(): React.JSX.Element {
       <SkillFreshnessNudge />
       <WorktreeBaseFallbackDialog />
       <ClaudeAccountSwitchDialog />
+      <TerminalAccountChoiceDialog />
       <PinnedTabCloseDialog />
       <RunningTerminalCloseDialog />
       {/* Electron drag hit-testing follows DOM order, ignoring z-index; render controls last to keep them clickable. */}

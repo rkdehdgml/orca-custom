@@ -1,6 +1,7 @@
 import { isNativeWindowsLocalPtySpawn } from '../../../runtime/terminal-model-query-authority'
 import { resolvePtySpawnHostEnv } from '../spawn-host-env'
 import type { PtyIpcSpawnState } from './spawn-state'
+import { normalizeTerminalAccountPin } from '../../../../shared/terminal-account-pin'
 
 export async function assemblePtyIpcSpawnCodexEnv(ctx: PtyIpcSpawnState): Promise<void> {
   const args = ctx.args
@@ -25,6 +26,10 @@ export async function assemblePtyIpcSpawnCodexEnv(ctx: PtyIpcSpawnState): Promis
     callerNamedSession: args.sessionId !== undefined,
     mintedSessionId: ctx.ownsNewIncarnation,
     resumeOnSelectedAccount: Boolean(args.replacesPtyId),
+    pinnedCodexAccountId:
+      ctx.codexSelectionTarget.runtime === 'wsl'
+        ? undefined
+        : normalizeTerminalAccountPin(args.accountPin)?.codexAccountId,
     emptySessionIdSkipsHostEnv: false,
     requestedAgentTeamsPath: ctx.requestedAgentTeamsPath,
     provider: ctx.provider,

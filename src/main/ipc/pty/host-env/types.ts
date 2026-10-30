@@ -39,6 +39,8 @@ export type BuildPtyHostEnvOptions = {
 export type CodexHomeLaunchContext = {
   unavailableManagedHomePath?: string
   launchesCodex?: boolean
+  /** A terminal pinned to one account launches from that account's home (null = System default); absent follows the global selection. */
+  pinnedAccountId?: string | null
 }
 
 // Codex hook-trust preparation may await app-server I/O without blocking main (#16441).

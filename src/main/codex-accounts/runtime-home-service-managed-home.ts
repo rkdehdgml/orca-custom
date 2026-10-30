@@ -93,6 +93,37 @@ export abstract class CodexRuntimeHomeManagedHome extends CodexRuntimeHomeSync {
     return homes
   }
 
+  /**
+   * Launch home for a terminal pinned to this account. Unlike the global selection it never touches
+   * the active account's bookkeeping, and it refuses rather than falling back to another identity.
+   */
+  preparePinnedAccountHome(accountId: string): string {
+    const account = this.store
+      .getSettings()
+      .codexManagedAccounts.find((candidate) => candidate.id === accountId)
+    if (!account || this.getWslManagedHomePath(account)) {
+      throw new Error(
+        'The Codex account this terminal was opened with is unavailable. Open a new terminal to choose another account.'
+      )
+    }
+    const resolved = this.resolveSelfContainedManagedHome(account)
+    if (resolved.kind === 'indeterminate') {
+      throw new ManagedCodexHomeTemporarilyUnavailableError()
+    }
+    if (resolved.kind === 'untrusted') {
+      throw new Error(
+        'The Codex account home for this terminal is not trusted. Sign in to it again.'
+      )
+    }
+    syncSystemCodexResourcesIntoManagedHome(resolved.homePath)
+    syncSystemConfigIntoManagedCodexHome({
+      runtimeHomePath: resolved.homePath,
+      systemHomePath: getSystemCodexHomePath()
+    })
+    this.startSelfContainedSessionBridgeForLaunch(resolved.homePath)
+    return resolved.homePath
+  }
+
   protected prepareSelfContainedManagedHomeForLaunch(
     account: CodexManagedAccount,
     unavailableManagedHomePath?: string

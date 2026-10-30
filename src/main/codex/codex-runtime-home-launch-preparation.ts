@@ -9,7 +9,10 @@ import { reconcileCodexHooksForLaunch } from './codex-hook-reconcile'
 import { grantCodexSandboxReadOnManagedHome } from './codex-windows-sandbox-read-grant'
 
 export function createCodexRuntimeHomeLaunchPreparation(deps: {
-  getRuntimeHome: () => Pick<CodexRuntimeHomeService, 'prepareForCodexLaunchAsync'> | null
+  getRuntimeHome: () => Pick<
+    CodexRuntimeHomeService,
+    'prepareForCodexLaunchAsync' | 'preparePinnedAccountHome'
+  > | null
   getSettings: () => GlobalSettings | undefined
 }) {
   return async (
@@ -22,9 +25,15 @@ export function createCodexRuntimeHomeLaunchPreparation(deps: {
       throw new Error('Codex runtime home service is not initialized')
     }
     // Propagate home failures: null selects the system account, which could launch the wrong identity (STA-4422).
-    const runtimeHomePath = await runtimeHome.prepareForCodexLaunchAsync(target, launchEnv, {
-      unavailableManagedHomePath: launchContext?.unavailableManagedHomePath
-    })
+    const pinnedAccountId = launchContext?.pinnedAccountId
+    const runtimeHomePath =
+      pinnedAccountId === undefined
+        ? await runtimeHome.prepareForCodexLaunchAsync(target, launchEnv, {
+            unavailableManagedHomePath: launchContext?.unavailableManagedHomePath
+          })
+        : pinnedAccountId === null
+          ? null
+          : runtimeHome.preparePinnedAccountHome(pinnedAccountId)
     const launchesCodex = launchContext?.launchesCodex === true
     if (runtimeHomePath === null && target?.runtime !== 'wsl') {
       // Only terminal Codex launches wait for the scheduled hook reconciliation.

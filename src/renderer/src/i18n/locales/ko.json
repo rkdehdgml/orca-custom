@@ -4029,6 +4029,24 @@
             "openSettings": "Open Settings",
             "gotIt": "Got it"
           },
+          "TerminalAccountChoice": {
+            "title": "이 터미널에서 사용할 계정 선택",
+            "description": "이 터미널은 닫을 때까지 선택한 계정을 유지하며, 다른 곳에서 계정을 바꿔도 영향을 받지 않습니다.",
+            "claude": "Claude 계정",
+            "codex": "Codex 계정",
+            "systemDefault": "시스템 기본 계정",
+            "start": "시작"
+          },
+          "UsageAccountStrip": {
+            "inUse": "사용 중",
+            "session": "5시간",
+            "weekly": "주간",
+            "resetsIn": "{{duration}} 후 초기화",
+            "resetsNow": "초기화 중",
+            "unitDay": "일",
+            "unitHour": "시간",
+            "unitMinute": "분"
+          },
           "UsageRosterPanel": {
             "title": "사용량",
             "openDetails": "사용량 세부 정보 열기",

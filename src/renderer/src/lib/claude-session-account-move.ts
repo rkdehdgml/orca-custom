@@ -99,6 +99,10 @@ function* localClaudePanes(
   const isLaneInScope = getCodexAccountSwitchLaneMatcher({ owner, target })
   for (const [worktreeId, tabs] of Object.entries(state.tabsByWorktree)) {
     for (const tab of tabs) {
+      // A terminal pinned to its own Claude account never follows the global switch.
+      if (tab.accountPin?.claudeAccountId !== undefined) {
+        continue
+      }
       const boundPtyIds = state.ptyIdsByTabId[tab.id] ?? []
       const leaves = state.terminalLayoutsByTabId[tab.id]?.ptyIdsByLeafId ?? {}
       for (const [leafId, ptyId] of Object.entries(leaves)) {

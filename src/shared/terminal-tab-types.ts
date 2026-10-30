@@ -1,6 +1,7 @@
 import type { AiVaultSessionTitle } from './ai-vault-session-title'
 import type { TuiAgent } from './tui-agent'
 import type { AgentLaunchPaneOutcome } from './agent-launch-pane-verdict'
+import type { TerminalAccountPin } from './terminal-account-pin'
 
 /** The tab row owns the recovery ledger, including the last reason it acted on. */
 export type TerminalPaneRecoveryReason =
@@ -65,6 +66,8 @@ export type TerminalTab = {
   generation?: number
   /** Keep shell identity/icon stable across default-setting changes; older saved tabs may omit this. */
   shellOverride?: string
+  /** Claude/Codex accounts this tab's terminals run under; closing the tab drops it. */
+  accountPin?: TerminalAccountPin
   /** Keeps an ephemeral host fallback out of the active project's runtime. */
   forceHostRuntime?: boolean
   /** An explorer cwd below root retains workspace tab/session ownership. */

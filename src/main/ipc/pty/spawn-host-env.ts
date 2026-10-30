@@ -84,6 +84,8 @@ type PtySpawnHostEnvArgs = {
   mintedSessionId: boolean
   /** An account-switch restart resumes onto the selected account; only the window has one. */
   resumeOnSelectedAccount: boolean
+  /** The terminal's own Codex account; undefined follows the global selection. */
+  pinnedCodexAccountId?: string | null
   /** Host accepts empty IDs without host env; window rejects them. */
   emptySessionIdSkipsHostEnv: boolean
   requestedAgentTeamsPath: string | undefined
@@ -117,8 +119,11 @@ export async function resolvePtySpawnHostEnv(args: PtySpawnHostEnvArgs): Promise
   const launchCommand = codexResumeLaunch.command
   const baseEnv = deps.stripSequencedStartupResumeArgv(args.env, codexResumeLaunch)
   const launchesCodex = args.launchAgent === 'codex'
+  const pinContext =
+    args.pinnedCodexAccountId !== undefined ? { pinnedAccountId: args.pinnedCodexAccountId } : {}
   const selectLaunchCodexHome = async (): Promise<string | null> =>
-    (await deps.getSelectedCodexHomePath?.(target, baseEnv, { launchesCodex })) ?? null
+    (await deps.getSelectedCodexHomePath?.(target, baseEnv, { launchesCodex, ...pinContext })) ??
+    null
   let selectedCodexHomePath = !args.preAdopted
     ? getCompatibleSelectedCodexHomePath(
         target,
@@ -138,14 +143,18 @@ export async function resolvePtySpawnHostEnv(args: PtySpawnHostEnvArgs): Promise
       resolveCurrent: async () =>
         getCompatibleSelectedCodexHomePath(
           target,
-          (await deps.getSelectedCodexHomePath?.(target, baseEnv, { launchesCodex })) ?? null
+          (await deps.getSelectedCodexHomePath?.(target, baseEnv, {
+            launchesCodex,
+            ...pinContext
+          })) ?? null
         ),
       resolveAfterUnavailable: async (unavailableManagedHomePath) =>
         getCompatibleSelectedCodexHomePath(
           target,
           (await deps.getSelectedCodexHomePath?.(target, baseEnv, {
             unavailableManagedHomePath,
-            launchesCodex
+            launchesCodex,
+            ...pinContext
           })) ?? null
         )
     })

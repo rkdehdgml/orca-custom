@@ -4413,6 +4413,24 @@
             "openSettings": "Open Settings",
             "gotIt": "Got it"
           },
+          "TerminalAccountChoice": {
+            "title": "Choose accounts for this terminal",
+            "description": "This terminal keeps these accounts until it is closed, even if you switch accounts elsewhere.",
+            "claude": "Claude account",
+            "codex": "Codex account",
+            "systemDefault": "System default",
+            "start": "Start"
+          },
+          "UsageAccountStrip": {
+            "inUse": "In use",
+            "session": "5h",
+            "weekly": "Weekly",
+            "resetsIn": "{{duration}} left",
+            "resetsNow": "Resetting",
+            "unitDay": "d",
+            "unitHour": "h",
+            "unitMinute": "m"
+          },
           "UsageRosterPanel": {
             "title": "Usage",
             "openDetails": "Open usage details",

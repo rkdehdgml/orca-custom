@@ -1,4 +1,5 @@
 import { getClaudeAgentViewService } from '../claude/agent-view-service'
+import { createHash } from 'node:crypto'
 import { existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { dirname, join } from 'node:path'
@@ -43,6 +44,8 @@ import {
 import { resolveLoginShellEnvironment } from '../startup/login-shell-environment'
 
 const REFRESH_WAIT_MS = 5_000
+const CLAUDE_PINNED_ACCOUNT_MISSING_MESSAGE =
+  'The Claude account this terminal was opened with no longer exists. Open a new terminal to choose another account.'
 
 export type ClaudeProfileRouterSettings = Pick<
   GlobalSettings,
@@ -310,6 +313,60 @@ export class ClaudeProfileRouter {
       wslLinuxConfigDir: null,
       envPatch: this.launchEnv(),
       provenance: home ? `profile:${profile?.accountId}` : 'system'
+    }
+  }
+
+  /**
+   * Pin one pane to an account (null = System default). The pane gets its own pointer file, so
+   * later changes to the global selection never reach it. A deleted account refuses the launch:
+   * silently falling back would run the pane under another identity.
+   */
+  async preparePaneAccount(
+    accountId: string | null,
+    paneKey: string
+  ): Promise<ClaudeRuntimeAuthPreparation> {
+    await this.envReady
+    if (accountId !== null && !findClaudeAccount(this.args.getSettings(), accountId)) {
+      throw new Error(CLAUDE_PINNED_ACCOUNT_MISSING_MESSAGE)
+    }
+    const profile =
+      accountId !== null && !this.coveredBySystemDefault(accountId)
+        ? this.describe(accountId)
+        : null
+    if (profile) {
+      if (existsSync(claudeProfileMarkerPath(profile))) {
+        this.setUpInBackground(profile)
+      } else {
+        // First use of this account: setup must finish before `claude` starts in it.
+        const report = await this.setUp(profile).catch(() => null)
+        if (report?.outcome !== 'prepared') {
+          throw claudeProfileSetupFailed()
+        }
+      }
+    }
+    const home = profile?.home ?? ''
+    const pointerPath = join(
+      this.args.dataRoot,
+      'claude-profiles',
+      'panes',
+      createHash('sha256').update(paneKey).digest('hex').slice(0, 24)
+    )
+    mkdirSync(dirname(pointerPath), { recursive: true, mode: 0o700 })
+    writeFileAtomically(pointerPath, home, { mode: 0o600 })
+    const userConfigDir = readUserClaudeConfigDirAsSet(this.env)
+    return {
+      configDir: profile?.home ?? this.systemDefaultHome(),
+      runtime: 'host',
+      wslDistro: null,
+      wslLinuxConfigDir: null,
+      envPatch: {
+        [CLAUDE_PROFILE_POINTER_ENV]: pointerPath,
+        ...(userConfigDir ? { [CLAUDE_USER_CONFIG_DIR_ENV]: userConfigDir } : {}),
+        ...(profile
+          ? { CLAUDE_CONFIG_DIR: profile.home, [CLAUDE_INJECTED_CONFIG_DIR_ENV]: profile.home }
+          : {})
+      },
+      provenance: profile ? `profile:${profile.accountId}` : 'system'
     }
   }
 

@@ -100,11 +100,12 @@ export function ProviderDetailsMenu({
           className="inline-flex items-center cursor-pointer rounded px-1 py-0.5 hover:bg-accent/70"
           aria-label={ariaLabel}
         >
-          {iconOnly ? (
-            <ProviderLetterBadge p={provider} />
-          ) : (
-            <ProviderSegment p={provider} compact={compact} display={usagePercentageDisplay} />
-          )}
+          {triggerContent ??
+            (iconOnly ? (
+              <ProviderLetterBadge p={provider} />
+            ) : (
+              <ProviderSegment p={provider} compact={compact} display={usagePercentageDisplay} />
+            ))}
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent

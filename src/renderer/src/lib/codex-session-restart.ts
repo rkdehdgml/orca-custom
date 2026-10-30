@@ -84,6 +84,8 @@ async function scanCodexPanes(
 ): Promise<CodexPaneScanResult[]> {
   const panes = Object.values(state.tabsByWorktree)
     .flat()
+    // A terminal pinned to its own Codex account never follows the global switch.
+    .filter((tab) => tab.accountPin?.codexAccountId === undefined)
     .flatMap((tab) =>
       (state.ptyIdsByTabId[tab.id] ?? [])
         .filter((ptyId) => args.ptyIdFilter === null || args.ptyIdFilter.has(ptyId))

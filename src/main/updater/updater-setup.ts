@@ -23,6 +23,9 @@ import { configureMacShipItScheduling } from './macos-shipit-scheduling'
 import { handleElectronUpdaterProxyLogin } from './electron-updater-proxy-session'
 import type { PreQuitCleanupFailureMode, UpdateInstallMode } from './updater-state'
 
+// A stock release would overwrite this fork's local patches.
+const FORK_AUTO_UPDATE_DISABLED = true
+
 export type UpdaterSetupOptions = {
   getLastUpdateCheckAt?: () => number | null
   onBeforeQuit?: () => void | Promise<void>
@@ -136,7 +139,7 @@ export class UpdaterSetup extends UpdaterDownloadInstall {
       this.sendErrorStatus(`The server update did not complete: ${serveHandoffFailure}`, true)
     }
 
-    if (!app.isPackaged) {
+    if (!app.isPackaged || FORK_AUTO_UPDATE_DISABLED) {
       return
     }
 

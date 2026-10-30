@@ -6,6 +6,7 @@ import {
 } from '../../runtime/agent-session-create-operation'
 import { callRuntimeRpc } from '../../runtime/runtime-rpc-client'
 import { toRuntimeTerminalWorktreeSelector } from '../../runtime/runtime-worktree-selector'
+import { resolveTerminalAccountPinForSpawn } from '@/lib/terminal-account-choice'
 
 type PtyConnectOptions = Parameters<PtyTransport['connect']>[0]
 const modelLaunchOperations = new WeakMap<IpcPtyTransportOptions, AgentSessionCreateOperation>()
@@ -96,7 +97,14 @@ export async function spawnIpcPty(
     resumesAgent && !admittedSessionId ? connectOptions.resumeSpawnIntent : undefined
   // Why: a reattach under an admitted session id must never stop the PTY it is reattaching.
   const replacesPtyId = admittedSessionId ? null : (connectOptions.claimReplacedPtyId?.() ?? null)
+  // A fresh terminal may wait here for the user to pick its Claude/Codex accounts.
+  const accountPin = await resolveTerminalAccountPinForSpawn({
+    tabId,
+    connectionId,
+    admittedSessionId
+  })
   return window.api.pty.spawn({
+    ...(accountPin ? { accountPin } : {}),
     cols: connectOptions.cols ?? 80,
     rows: connectOptions.rows ?? 24,
     cwd,

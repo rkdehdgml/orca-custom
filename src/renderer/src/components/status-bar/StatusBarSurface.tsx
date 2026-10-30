@@ -128,7 +128,7 @@ export function StatusBarSurface({
     >
       {/* Why: usage gives way first — what it drops stays one click away in its popover. */}
       <div
-        className="status-bar-usage-cluster flex min-w-0 flex-1 items-center overflow-clip [overflow-clip-margin:3px]"
+        className="status-bar-usage-cluster hidden min-w-0 flex-1 items-center overflow-clip [overflow-clip-margin:3px]"
         data-overflowing={overflowing}
       >
         <div ref={usageRef} className="flex shrink-0 items-center gap-3">
@@ -286,7 +286,7 @@ export function StatusBarSurface({
 
       {/* Why: attention segments never clip; below the tightest density they scroll rather than vanish. */}
       <div
-        className="min-w-0 data-[overflowing=true]:overflow-x-auto data-[overflowing=true]:scrollbar-none"
+        className="ml-auto min-w-0 data-[overflowing=true]:overflow-x-auto data-[overflowing=true]:scrollbar-none"
         data-overflowing={overflowing}
       >
         <div ref={segmentsRef} className="flex w-max items-center gap-3">

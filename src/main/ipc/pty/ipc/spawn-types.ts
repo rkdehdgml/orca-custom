@@ -45,6 +45,8 @@ export type PtySpawnIpcArgs = {
   // A view attaches to the main-started session or starts nothing.
   attachOnlyView?: boolean
   shellOverride?: string
+  // Untyped at the IPC boundary; main validates it through normalizeTerminalAccountPin.
+  accountPin?: unknown
   projectRuntime?: ProjectExecutionRuntimeResolution
   terminalKittyKeyboardProtocol?: boolean
   terminalColorQueryReplies?: {

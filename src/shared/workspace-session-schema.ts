@@ -32,6 +32,7 @@ import {
 } from './workspace-session-tab-type-schema'
 import { salvagedField, salvagedOptional, salvagingArray, salvagingRecord } from './zod-salvage'
 import { isStructuredAgentId } from './agent-session-provider-handle-encoding'
+import { normalizeTerminalAccountPin } from './terminal-account-pin'
 
 const workspaceKeySchema = z.custom<WorkspaceKey>(
   (value) => typeof value === 'string' && isWorkspaceKey(value)
@@ -63,6 +64,11 @@ export const terminalTabSchema = z.object({
   createdAt: z.number(),
   generation: z.number().optional(),
   startupCwd: z.string().min(1).optional(),
+  // A malformed pin degrades to absent so a terminal never silently runs under another account's id.
+  accountPin: z
+    .unknown()
+    .transform((value) => normalizeTerminalAccountPin(value))
+    .optional(),
   // Retain the idle agent icon before hooks fire; unknown IDs degrade to absent without resetting the session.
   launchAgent: z
     .custom<TuiAgent>((v) => isTuiAgent(v))
