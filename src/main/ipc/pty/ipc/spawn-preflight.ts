@@ -46,7 +46,8 @@ export async function preparePtyIpcSpawnPreflight(ctx: PtyIpcSpawnState): Promis
     const admission = ctx.deps.assertWorkspaceAcceptsNewPty(
       args.worktreeId,
       args.sessionId,
-      localPtySpawnCwd(args)
+      localPtySpawnCwd(args),
+      args.wslPassiveRestore === true
     )
     if (admission) {
       await admission
@@ -59,7 +60,8 @@ export async function preparePtyIpcSpawnPreflight(ctx: PtyIpcSpawnState): Promis
     const admission = ctx.deps.assertWorkspaceAcceptsNewPty(
       args.worktreeId,
       args.sessionId,
-      localPtySpawnCwd(args)
+      localPtySpawnCwd(args),
+      args.wslPassiveRestore === true
     )
     if (admission) {
       await admission
@@ -101,7 +103,17 @@ export async function preparePtyIpcSpawnPreflight(ctx: PtyIpcSpawnState): Promis
     projectRuntimeSource: { kind: 'sent', projectRuntime: args.projectRuntime },
     preAdopted: ctx.preAdoptedStablePane !== null,
     getSettings: ctx.deps.getSettings,
-    resolveStartupCwd: ctx.deps.resolvePtySpawnStartupCwd
+    resolveStartupCwd: ctx.deps.resolvePtySpawnStartupCwd,
+    ...(args.wslPassiveRestore === true
+      ? {
+          wslStartHold: {
+            wslPassiveRestore: true,
+            sessionId: ctx.effectiveSessionId,
+            isNewSession: ctx.ownsNewIncarnation,
+            attachOnly: args.attachOnlyView === true
+          }
+        }
+      : {})
   })
   ctx.cwd = target.cwd
   ctx.prevalidatedCwd = target.prevalidatedCwd
@@ -110,6 +122,7 @@ export async function preparePtyIpcSpawnPreflight(ctx: PtyIpcSpawnState): Promis
   ctx.startupCwdFallback = target.startupCwdFallback
   ctx.terminalRuntimeOptions = target.terminalRuntimeOptions
   ctx.expectedWslDistro = target.expectedWslDistro
+  ctx.wslHoldReadAnchor = target.wslHoldReadAnchor
   ctx.codexSelectionTarget = target.codexSelectionTarget
   ctx.spawnTiming.mark('preflight')
   const accountPin = normalizeTerminalAccountPin(args.accountPin)

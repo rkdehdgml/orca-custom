@@ -31,6 +31,7 @@ export async function assemblePtyIpcSpawnCodexEnv(ctx: PtyIpcSpawnState): Promis
         ? undefined
         : normalizeTerminalAccountPin(args.accountPin)?.codexAccountId,
     emptySessionIdSkipsHostEnv: false,
+    wslPassiveRestore: args.wslPassiveRestore === true,
     requestedAgentTeamsPath: ctx.requestedAgentTeamsPath,
     provider: ctx.provider,
     deps: ctx.deps,
